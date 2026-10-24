@@ -1,0 +1,17 @@
+{
+  "name": "Đăng ký BHYT thân nhân CBCS",
+  "short_name": "BHYT CBCS",
+  "description": "Kê khai thân nhân tham gia bảo hiểm y tế – Công an TP Hồ Chí Minh",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#22402f",
+  "theme_color": "#22402f",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

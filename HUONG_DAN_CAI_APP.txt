@@ -1,0 +1,77 @@
+HƯỚNG DẪN ĐƯA ỨNG DỤNG "ĐĂNG KÝ BHYT THÂN NHÂN CBCS" LÊN ĐIỆN THOẠI (iPhone / Android)
+Dùng với Code.gs từ phiên bản 1.6.0
+
+Thư mục này là "vỏ ứng dụng" (PWA). Nó chứa icon huy hiệu, màn hình khởi động và tên app.
+Dữ liệu vẫn nằm trong Google Sheet như cũ. Vỏ app chỉ mở ứng dụng web (link /exec) bên trong,
+toàn màn hình, không có thanh địa chỉ trình duyệt.
+
+Trong thư mục:
+  index.html            – trang vỏ app (CHỈ CẦN SỬA 1 DÒNG)
+  manifest.webmanifest  – tên app, màu, icon
+  sw.js                 – giúp app mở nhanh, cài được trên Android
+  icons/                – icon huy hiệu cho màn hình chính, màn hình khởi động
+
+----------------------------------------------------------------------------------------
+BƯỚC 1. DÁN LINK ỨNG DỤNG VÀO index.html
+----------------------------------------------------------------------------------------
+1. Trong Apps Script: Triển khai → Quản lý các bản triển khai → sao chép "URL ứng dụng web"
+   (link dạng https://script.google.com/macros/s/....../exec).
+2. Mở file index.html bằng Notepad (chuột phải → Mở bằng → Notepad).
+3. Tìm dòng:   var APP_URL = 'DAN_LINK_EXEC_VAO_DAY';
+   Thay DAN_LINK_EXEC_VAO_DAY bằng link vừa sao chép, giữ nguyên hai dấu nháy đơn. Ví dụ:
+   var APP_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
+4. Lưu file.
+
+Lưu ý: bản triển khai Apps Script phải để "Người có quyền truy cập: Bất kỳ ai".
+
+----------------------------------------------------------------------------------------
+BƯỚC 2. ĐƯA THƯ MỤC LÊN MẠNG (miễn phí, dùng GitHub Pages)
+----------------------------------------------------------------------------------------
+1. Vào https://github.com → đăng ký tài khoản (nếu chưa có).
+2. Bấm dấu "+" góc trên phải → "New repository".
+   - Repository name: bhyt-cbcs (hoặc tên khác, viết liền, không dấu)
+   - Chọn Public → bấm "Create repository".
+3. Trong trang repository vừa tạo, bấm "uploading an existing file".
+   Kéo thả TẤT CẢ nội dung thư mục này vào (index.html, manifest.webmanifest, sw.js và thư mục icons).
+   Bấm "Commit changes".
+4. Vào Settings → Pages (menu bên trái).
+   - Source: "Deploy from a branch"
+   - Branch: main, thư mục / (root) → Save.
+5. Chờ 1–2 phút, tải lại trang Settings → Pages sẽ thấy link dạng:
+   https://<ten-tai-khoan>.github.io/bhyt-cbcs/
+   Đây là LINK APP gửi cho CBCS.
+
+(Cách khác không cần GitHub: dùng Netlify – https://app.netlify.com/drop , đăng ký tài khoản miễn phí
+ rồi kéo thả cả thư mục vào là có link.)
+
+----------------------------------------------------------------------------------------
+BƯỚC 3. CÀI APP LÊN ĐIỆN THOẠI
+----------------------------------------------------------------------------------------
+iPhone / iPad:
+  1. Mở LINK APP bằng Safari (không dùng Zalo/Facebook mở trực tiếp).
+  2. Bấm nút Chia sẻ (ô vuông có mũi tên lên) ở cạnh dưới màn hình.
+  3. Chọn "Thêm vào MH chính" → "Thêm".
+  → Màn hình chính có icon huy hiệu tên "BHYT CBCS". Mở từ icon sẽ chạy toàn màn hình như app.
+
+Android:
+  1. Mở LINK APP bằng Chrome.
+  2. App tự hiện gợi ý "Cài ứng dụng" → bấm Cài. Nếu không thấy: menu ⋮ → "Cài đặt ứng dụng"
+     hoặc "Thêm vào màn hình chính".
+  → App có icon huy hiệu trong màn hình chính và ngăn kéo ứng dụng.
+
+Khi gửi link qua Zalo: dặn CBCS bấm "Mở bằng trình duyệt" (Safari/Chrome) rồi mới cài.
+
+----------------------------------------------------------------------------------------
+KHI CẬP NHẬT
+----------------------------------------------------------------------------------------
+- Sửa Code.gs (phiên bản mới): dán đè, Lưu, Triển khai → Quản lý các bản triển khai → bút chì →
+  Phiên bản mới → Triển khai. Link /exec giữ nguyên nên KHÔNG cần sửa vỏ app, máy CBCS tự nhận bản mới.
+- Đổi tên app / icon: sửa manifest.webmanifest hoặc thay ảnh trong icons/, rồi tải lên GitHub lại.
+  Trong sw.js đổi 'bhyt-cbcs-v1' thành 'bhyt-cbcs-v2' để máy CBCS nhận icon mới.
+  (Trên iPhone, muốn đổi icon đã cài thì phải xóa app khỏi màn hình chính rồi thêm lại.)
+
+GIỚI HẠN CẦN BIẾT
+- Đây là ứng dụng web cài ra màn hình chính (PWA), không phải app trên App Store/CH Play.
+- Cần có mạng khi dùng (dữ liệu lưu trực tiếp vào Google Sheet).
+- Trên iPhone, nút tải file (Excel/Word) có thể mở bản xem trước; bấm nút Chia sẻ → "Lưu vào Tệp"
+  để lưu file.
