@@ -33,12 +33,7 @@
   @keyframes q { to { transform:rotate(360deg); } }
   @media (prefers-reduced-motion:reduce) { .spin { animation-duration:3s; } }
   .nut { margin-top:8px; background:var(--gold); color:#1d2a20; border:0; border-radius:12px; padding:12px 22px; font-size:16px; font-weight:700; cursor:pointer; }
-  #cai { position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:20; background:#fff; color:#18221c; border-radius:16px; padding:16px; box-shadow:0 10px 40px rgba(0,0,0,.35); font-size:15px; line-height:1.45; }
-  #cai[hidden], #splash [hidden] { display:none !important; }
-  #cai b { color:var(--green); }
-  #cai .hang { display:flex; gap:10px; margin-top:12px; }
-  #cai button { flex:1; border-radius:10px; padding:11px; font-size:15px; font-weight:600; border:1px solid #d8ded8; background:#fff; cursor:pointer; }
-  #cai button.chinh { background:var(--green); color:#fff; border-color:var(--green); }
+  #splash [hidden] { display:none !important; }
 </style>
 </head>
 <body>
@@ -54,13 +49,6 @@
   <button class="nut" id="thuLai" type="button" hidden>Thử lại</button>
 </div>
 
-<div id="cai" hidden>
-  <div id="caiNoiDung"></div>
-  <div class="hang">
-    <button type="button" id="caiDong">Để sau</button>
-    <button type="button" class="chinh" id="caiNgay" hidden>Cài ứng dụng</button>
-  </div>
-</div>
 
 <script>
 /* ====== DÁN LINK ỨNG DỤNG WEB (kết thúc bằng /exec) VÀO GIỮA HAI DẤU NHÁY ====== */
@@ -78,7 +66,7 @@ var APP_URL = 'https://script.google.com/macros/s/AKfycbyfKgIA3aO4i5c3LlLwUSDBB_
   function loi(msg) { spin.hidden = true; tt.textContent = msg; thuLai.hidden = false; }
   function anSplash() {
     if (daMo) return; daMo = true; clearTimeout(hen);
-    setTimeout(function () { splash.classList.add('an'); setTimeout(hienGoiYCai, 900); }, Math.max(0, 1200 - (Date.now() - batDau)));
+    setTimeout(function () { splash.classList.add('an'); }, Math.max(0, 1200 - (Date.now() - batDau)));
   }
   function mo() {
     daMo = false; spin.hidden = false; thuLai.hidden = true; splash.classList.remove('an');
@@ -97,35 +85,6 @@ var APP_URL = 'https://script.google.com/macros/s/AKfycbyfKgIA3aO4i5c3LlLwUSDBB_
   thuLai.addEventListener('click', mo);
   window.addEventListener('online', function () { if (!daMo) mo(); });
   mo();
-
-  /* ---- Gợi ý cài ứng dụng ra màn hình chính ---- */
-  var cai = document.getElementById('cai'), noiDung = document.getElementById('caiNoiDung');
-  var nutCai = document.getElementById('caiNgay'), suKienCai = null;
-  var laApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  var laIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  function daAn() { try { return localStorage.getItem('bhyt_an_goi_y') === '1'; } catch (e) { return false; } }
-  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); suKienCai = e; });
-  function hienGoiYCai() {
-    if (laApp || daAn()) return;
-    if (laIOS) {
-      noiDung.innerHTML = '<b>Cài ứng dụng lên iPhone:</b><br>1. Mở link này bằng <b>Safari</b>.<br>2. Bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên lên) ở cạnh dưới.<br>3. Chọn <b>“Thêm vào MH chính”</b> → <b>Thêm</b>.';
-    } else if (suKienCai) {
-      noiDung.innerHTML = '<b>Cài ứng dụng lên điện thoại</b> để mở nhanh từ màn hình chính, chạy toàn màn hình như app.';
-      nutCai.hidden = false;
-    } else if (/android/i.test(navigator.userAgent)) {
-      noiDung.innerHTML = '<b>Cài ứng dụng lên Android:</b><br>Mở link bằng <b>Chrome</b> → bấm menu <b>⋮</b> → <b>“Cài đặt ứng dụng”</b> hoặc <b>“Thêm vào màn hình chính”</b>.';
-    } else return;
-    cai.hidden = false;
-  }
-  nutCai.addEventListener('click', function () {
-    if (!suKienCai) return;
-    suKienCai.prompt();
-    suKienCai.userChoice.finally(function () { suKienCai = null; cai.hidden = true; });
-  });
-  document.getElementById('caiDong').addEventListener('click', function () {
-    cai.hidden = true;
-    try { localStorage.setItem('bhyt_an_goi_y', '1'); } catch (e) {}
-  });
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
