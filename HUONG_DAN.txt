@@ -1,0 +1,11 @@
+VỎ APP – BẢN PHẲNG (tất cả file nằm chung 1 chỗ, không có thư mục con)
+Link /exec đã điền sẵn trong index.html.
+
+Cập nhật lên GitHub (kho xdptq6/BHYT2027):
+1. Vào trang kho → Add file → Upload files → choose your files.
+2. Chọn TẤT CẢ file trong thư mục này (Ctrl+A) → Open.
+3. Bấm Commit changes. File trùng tên sẽ được thay bằng bản mới.
+4. Chờ 1–2 phút, mở https://xdptq6.github.io/BHYT2027/ rồi bấm Ctrl+F5.
+
+Thư mục "icons" cũ trên GitHub (nếu đã tạo) để nguyên hay xóa đều được.
+Khi đổi link /exec: mở index.html trên GitHub → bút chì → sửa dòng var APP_URL → Commit changes.

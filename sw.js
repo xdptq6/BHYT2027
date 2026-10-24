@@ -1,7 +1,7 @@
 /* Service worker của vỏ ứng dụng: lưu sẵn màn hình khởi động và icon để app mở nhanh.
    Dữ liệu BHYT không lưu ở đây – luôn lấy trực tiếp từ Google. Đổi số v2, v3… khi sửa index.html. */
-var BO_NHO = 'bhyt-cbcs-v1';
-var TEP = ['./', 'index.html', 'manifest.webmanifest', 'icons/emblem.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-48.png'];
+var BO_NHO = 'bhyt-cbcs-v2';
+var TEP = ['./', 'index.html', 'manifest.webmanifest', 'emblem.png', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'favicon-48.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(BO_NHO).then(function (c) { return c.addAll(TEP); }).then(function () { return self.skipWaiting(); }));
