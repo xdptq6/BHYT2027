@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <!--
-  VỎ ỨNG DỤNG ĐIỆN THOẠI – Đăng ký BHYT thân nhân CBCS (dùng với Code.gs từ phiên bản 1.6.0)
+  VỎ ỨNG DỤNG ĐIỆN THOẠI – Đăng ký BHYT thân nhân CBCS (dùng với Code.gs từ phiên bản 1.13.1)
+  Màn hình chờ: chữ, màu nền, font, cỡ chữ do admin sửa ở tab Giao diện → "Màn hình chờ khi mở app điện thoại".
+  App gửi nội dung đó về đây và được ghi nhớ trên máy; lần mở sau hiện đúng như đã sửa.
   Bản phẳng: tất cả file (kể cả ảnh) nằm chung một chỗ. Link /exec đã điền sẵn ở dòng APP_URL bên dưới.
 -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -26,8 +28,8 @@
   #splash { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:24px; text-align:center; color:#fff; background:linear-gradient(180deg,var(--green),var(--green-2)); transition:opacity .45s ease; }
   #splash.an { opacity:0; pointer-events:none; }
   #splash img { width:min(58vw,250px); height:auto; filter:drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
-  #splash .t1 { font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.8; font-weight:600; margin-top:6px; }
-  #splash .t2 { font-size:20px; font-weight:700; line-height:1.3; max-width:22em; }
+  #mcDong { display:flex; flex-direction:column; gap:.45em; width:100%; max-width:30em; margin-top:6px; }
+  #mcDong .ln { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.35; }
   #splash .tt { font-size:14px; opacity:.85; min-height:1.4em; }
   .spin { width:30px; height:30px; border:3px solid rgba(255,255,255,.25); border-top-color:var(--gold); border-radius:50%; animation:q .8s linear infinite; margin-top:8px; }
   @keyframes q { to { transform:rotate(360deg); } }
@@ -42,8 +44,10 @@
 
 <div id="splash" role="status" aria-live="polite">
   <img src="emblem.png" alt="Huy hiệu Công an nhân dân">
-  <div class="t1">Công an TP Hồ Chí Minh</div>
-  <div class="t2">Đăng ký BHYT thân nhân CBCS</div>
+  <div id="mcDong">
+    <div class="ln" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#D9E3DB;text-align:center">Công an TP Hồ Chí Minh</div>
+    <div class="ln" style="font-size:20px;font-weight:700;color:#FFFFFF;text-align:center">Đăng ký BHYT thân nhân CBCS</div>
+  </div>
   <div class="spin" id="spin"></div>
   <div class="tt" id="tt">Đang mở ứng dụng…</div>
   <button class="nut" id="thuLai" type="button" hidden>Thử lại</button>
@@ -52,8 +56,53 @@
 
 <script>
 /* ====== DÁN LINK ỨNG DỤNG WEB (kết thúc bằng /exec) VÀO GIỮA HAI DẤU NHÁY ====== */
-var APP_URL = 'https://script.google.com/macros/s/AKfycbyVVQQrxdOUznhciuM920hlHKHFJdtWevufT6EzRwOTDEEV7kh1XD0bPiSD3fvYbswC/exec';
+var APP_URL = 'https://script.google.com/macros/s/AKfycbyfKgIA3aO4i5c3LlLwUSDBB_wfZHiomO8We7KQV-UxyDXvHx0az-h2RbDmajXpjCM/exec';
 /* ================================================================================ */
+
+/* ---- Màn hình chờ: nội dung do admin sửa trong app (tab Giao diện), ghi nhớ trên máy ---- */
+(function () {
+  var KHOA = 'bhyt_man_cho', HE_THONG = { 'Times New Roman': 1, 'Arial': 1 }, daNap = {};
+  function mau(c) { return /^#[0-9a-f]{6}$/i.test(String(c || '')) ? c : ''; }
+  function napFont(f) {
+    if (!f || HE_THONG[f] || daNap[f] || !/^[A-Za-z ]{2,40}$/.test(f)) return;
+    daNap[f] = 1;
+    var l = document.createElement('link'); l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(f) + ':ital,wght@0,400;0,700;1,400&display=swap';
+    document.head.appendChild(l);
+  }
+  function ve(d) {
+    if (!d || !Array.isArray(d.dong)) return;
+    var hop = document.getElementById('mcDong'), sp = document.getElementById('splash');
+    hop.innerHTML = '';
+    d.dong.slice(0, 20).forEach(function (l) {
+      if (!l || typeof l.t !== 'string') return;
+      var e = document.createElement('div'), st = e.style, co = Math.round(Number(l.s) || 15);
+      e.className = 'ln'; e.textContent = l.t.slice(0, 500);
+      st.fontSize = Math.max(8, Math.min(72, co)) + 'px';
+      st.fontWeight = l.b ? '700' : '400'; st.fontStyle = l.i ? 'italic' : 'normal';
+      if (l.u) { st.textTransform = 'uppercase'; st.letterSpacing = '.08em'; }
+      st.color = mau(l.c) || '#FFFFFF';
+      st.textAlign = ['left', 'center', 'right', 'justify'].indexOf(l.a) >= 0 ? l.a : 'center';
+      if (l.f && /^[A-Za-z ]{2,40}$/.test(l.f)) { napFont(l.f); st.fontFamily = '"' + l.f + '", system-ui, sans-serif'; }
+      hop.appendChild(e);
+    });
+    var nen = mau(d.nen);
+    if (nen) {
+      sp.style.background = nen; document.body.style.background = nen;
+      var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', nen);
+    }
+    if (typeof d.logo === 'string' && /^data:image\/(png|webp|jpeg);base64,[A-Za-z0-9+\/=]+$/.test(d.logo)) document.querySelector('#splash img').src = d.logo;
+  }
+  try { ve(JSON.parse(localStorage.getItem(KHOA) || 'null')); } catch (e) {}
+  window.addEventListener('message', function (e) {
+    var o = String(e.origin || '');
+    if (!/^https:\/\/([a-z0-9-]+\.)*(googleusercontent\.com|script\.google\.com)$/.test(o) && !/^http:\/\/localhost(:\d+)?$/.test(o)) return;
+    var d = e.data;
+    if (!d || d.loai !== 'bhyt-man-cho' || !Array.isArray(d.dong)) return;
+    try { localStorage.setItem(KHOA, JSON.stringify({ dong: d.dong, nen: d.nen, logo: d.logo })); } catch (er) {}
+    ve(d);
+  });
+})();
 
 (function () {
   var khung = document.getElementById('app');
