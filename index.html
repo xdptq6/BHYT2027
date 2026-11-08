@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <!--
-  VỎ ỨNG DỤNG ĐIỆN THOẠI – Đăng ký BHYT thân nhân CBCS (dùng với Code.gs từ phiên bản 1.13.1)
+  VỎ ỨNG DỤNG ĐIỆN THOẠI – Đăng ký BHYT thân nhân CBCS (dùng với Code.gs từ phiên bản 1.15.0)
+  Từ ngày DONG_LINK (mặc định 05/11/2026 00:00) trang tự hiện "404 – Không tìm thấy trang".
+  Sau khi đóng: thêm ?quantri=1 vào cuối link để vào trang quản trị, ?giahan=1 cho CBCS được gia hạn.
   Màn hình chờ: chữ, màu nền, font, cỡ chữ do admin sửa ở tab Giao diện → "Màn hình chờ khi mở app điện thoại".
   App gửi nội dung đó về đây và được ghi nhớ trên máy; lần mở sau hiện đúng như đã sửa.
   Bản phẳng: tất cả file (kể cả ảnh) nằm chung một chỗ. Link /exec đã điền sẵn ở dòng APP_URL bên dưới.
@@ -56,11 +58,31 @@
 
 <script>
 /* ====== DÁN LINK ỨNG DỤNG WEB (kết thúc bằng /exec) VÀO GIỮA HAI DẤU NHÁY ====== */
-var APP_URL = 'https://script.google.com/macros/s/AKfycbyGq2aFPf2sKMPangzngv9UZUU-SzEv7KPP6jJCCX9-Yz1-pCHRS7FuhiTt466k1K1_/exec';
+/* ====== NGÀY ĐÓNG LINK: từ thời điểm này trang chỉ hiện "404 – Không tìm thấy trang" (giờ Việt Nam) ======
+   Muốn đổi ngày: sửa trong dấu nháy, dạng năm-tháng-ngàyTgiờ:phút. Muốn không đóng: để trống ''. */
+var DONG_LINK = '2026-11-05T00:00';
+/* ================================================================================================= */
+var APP_URL = 'https://script.google.com/macros/s/AKfycbyfKgIA3aO4i5c3LlLwUSDBB_wfZHiomO8We7KQV-UxyDXvHx0az-h2RbDmajXpjCM/exec';
 /* ================================================================================ */
 
+/* ---- Đóng link: qua ngày thì thay toàn bộ trang bằng trang 404 ---- */
+/* Sau khi đóng link vẫn vào được nếu thêm vào cuối link: ?quantri=1 (quản trị) hoặc ?giahan=1 (CBCS được gia hạn) */
+var VAO_RIENG = (location.search.match(/[?&](quantri|giahan)=1(?:&|$)/) || [])[1] || '';
+var DA_DONG = !VAO_RIENG && !!DONG_LINK && Date.now() >= Date.parse(DONG_LINK + ':00+07:00');
+if (DA_DONG) {
+  document.title = 'Không tìm thấy trang';
+  document.documentElement.style.background = '#fff';
+  document.body.innerHTML = '<main style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box;background:#fff;color:#3c4043;flex:1">' +
+    '<b style="font-size:72px;color:#9aa0a6;line-height:1">404</b><h1 style="font-size:22px;font-weight:500;margin:18px 0 8px">Không tìm thấy trang</h1>' +
+    '<p style="margin:0;color:#5f6368;font-size:15px;max-width:30em;line-height:1.5">Đường dẫn bạn truy cập không tồn tại hoặc đã bị xóa.</p></main>';
+  document.body.style.background = '#fff';
+  var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', '#ffffff');
+  var mf = document.querySelector('link[rel="manifest"]'); if (mf) mf.remove();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+}
+
 /* ---- Màn hình chờ: nội dung do admin sửa trong app (tab Giao diện), ghi nhớ trên máy ---- */
-(function () {
+if (!DA_DONG) (function () {
   var KHOA = 'bhyt_man_cho', HE_THONG = { 'Times New Roman': 1, 'Arial': 1 }, daNap = {};
   function mau(c) { return /^#[0-9a-f]{6}$/i.test(String(c || '')) ? c : ''; }
   function napFont(f) {
@@ -104,7 +126,7 @@ var APP_URL = 'https://script.google.com/macros/s/AKfycbyGq2aFPf2sKMPangzngv9UZU
   });
 })();
 
-(function () {
+if (!DA_DONG) (function () {
   var khung = document.getElementById('app');
   var splash = document.getElementById('splash');
   var tt = document.getElementById('tt');
@@ -126,7 +148,7 @@ var APP_URL = 'https://script.google.com/macros/s/AKfycbyGq2aFPf2sKMPangzngv9UZU
     if (!navigator.onLine) { loi('Điện thoại đang không có mạng. Bật Wi-Fi hoặc 4G rồi bấm Thử lại.'); return; }
     tt.textContent = 'Đang mở ứng dụng…';
     batDau = Date.now();
-    khung.src = APP_URL + (APP_URL.indexOf('?') < 0 ? '?' : '&') + 'app=1&t=' + Date.now();
+    khung.src = APP_URL + (APP_URL.indexOf('?') < 0 ? '?' : '&') + 'app=1' + (VAO_RIENG ? '&' + VAO_RIENG + '=1' : '') + '&t=' + Date.now();
     clearTimeout(hen);
     hen = setTimeout(function () { if (!daMo) loi('Mạng chậm, ứng dụng chưa mở được. Bấm Thử lại.'); }, 30000);
   }
