@@ -58,9 +58,9 @@
 
 <script>
 /* ====== DÁN LINK ỨNG DỤNG WEB (kết thúc bằng /exec) VÀO GIỮA HAI DẤU NHÁY ====== */
-/* ====== NGÀY ĐÓNG LINK: từ thời điểm này trang chỉ hiện "404 – Không tìm thấy trang" (giờ Việt Nam) ======
-   Muốn đổi ngày: sửa trong dấu nháy, dạng năm-tháng-ngàyTgiờ:phút. Muốn không đóng: để trống ''. */
-var DONG_LINK = '2026-11-05T00:00';
+/* ====== NGÀY ĐÓNG LINK: NÊN ĐỂ TRỐNG ''. Kiểu khóa (chỉ xem / mất trang 404) chọn trong ứng dụng: Quản trị → Cài đặt thời gian.
+   Chỉ điền ngày (dạng năm-tháng-ngàyTgiờ:phút, giờ Việt Nam) nếu muốn trang GitHub tự hiện 404 kể cả khi ứng dụng chưa đóng. */
+var DONG_LINK = '';
 /* ================================================================================================= */
 var APP_URL = 'https://script.google.com/macros/s/AKfycbyfKgIA3aO4i5c3LlLwUSDBB_wfZHiomO8We7KQV-UxyDXvHx0az-h2RbDmajXpjCM/exec';
 /* ================================================================================ */
@@ -69,7 +69,7 @@ var APP_URL = 'https://script.google.com/macros/s/AKfycbyfKgIA3aO4i5c3LlLwUSDBB_
 /* Sau khi đóng link vẫn vào được nếu thêm vào cuối link: ?quantri=1 (quản trị) hoặc ?giahan=1 (CBCS được gia hạn) */
 var VAO_RIENG = (location.search.match(/[?&](quantri|giahan)=1(?:&|$)/) || [])[1] || '';
 var DA_DONG = !VAO_RIENG && !!DONG_LINK && Date.now() >= Date.parse(DONG_LINK + ':00+07:00');
-if (DA_DONG) {
+function hien404() {
   document.title = 'Không tìm thấy trang';
   document.documentElement.style.background = '#fff';
   document.body.innerHTML = '<main style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box;background:#fff;color:#3c4043;flex:1">' +
@@ -80,6 +80,13 @@ if (DA_DONG) {
   var mf = document.querySelector('link[rel="manifest"]'); if (mf) mf.remove();
   if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
 }
+if (DA_DONG) hien404();
+/* Ứng dụng (Apps Script) báo đã đóng link → hiện trang 404 toàn màn hình, không cần sửa ngày ở file này */
+if (!VAO_RIENG) window.addEventListener('message', function (e) {
+  var o = String(e.origin || '');
+  if (!/^https:\/\/([a-z0-9-]+\.)*(googleusercontent\.com|script\.google\.com)$/.test(o) && !/^http:\/\/localhost(:\d+)?$/.test(o)) return;
+  if (e.data && e.data.loai === 'trang-404') hien404();
+});
 
 /* ---- Màn hình chờ: nội dung do admin sửa trong app (tab Giao diện), ghi nhớ trên máy ---- */
 if (!DA_DONG) (function () {
